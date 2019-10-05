@@ -1,3 +1,5 @@
-.pio
 .clang_complete
 .gcc-flags.json
+.pio*
+src/my_secrets.h
+platformio.ini
