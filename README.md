@@ -25,4 +25,5 @@ Charlieplexing is possible with low-current LEDs (~12mA).
 
 ### analog input
 
+There is only one, A0.
 0V will result in a `0`, 3.3V will result in a `4096`. Higher voltage will kill the chip.
