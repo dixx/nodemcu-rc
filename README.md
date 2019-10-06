@@ -12,9 +12,9 @@ Safe to use are
 - GPIO14 (D5)
 - GPIO12 (D6)
 - GPIO13 (D7)
-- Generally available are GPIO1 (U0TXD) and GPIO3 (U0RXD) **if not using serial**.
 - GPIO0 (D3) and GPIO2 (D4) are safe **if HIGH during boot**, use pull-up resistors.
 - GPIO15 (D8) is safe **if LOW during boot**, use a pull-down resistor.
+- Also available are GPIO1 (U0TXD) and GPIO3 (U0RXD) **if not using serial**.
 
 In general, [pull resistors](https://en.wikipedia.org/wiki/Pull-up_resistor) shoult be between 10kΩ..100kΩ.
 
