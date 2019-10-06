@@ -1,7 +1,11 @@
 # nodemcu-rc
 Remote Control using NodeMCU WiFi
 
-# Hardware hints
+## goal
+Have one or two receivers connected to it and send inputs of some buttons to them via own WiFi.
+
+---
+# hardware hints
 
 ### digital input
 
