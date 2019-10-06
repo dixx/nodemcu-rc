@@ -5,11 +5,22 @@ Remote Control using NodeMCU WiFi
 
 ### digital input
 
-When using switches from `GND` to the input, use also 10k..100k resistors from 3.3V to the input. (see https://en.wikipedia.org/wiki/Pull-up_resistor)
+Safe to use are
+- GPIO16 (D0)
+- GPIO5 (D1)
+- GPIO4 (D2)
+- GPIO14 (D5)
+- GPIO12 (D6)
+- GPIO13 (D7)
+- Generally available are GPIO1 (U0TXD) and GPIO3 (U0RXD) **if not using serial**.
+- GPIO0 (D3) and GPIO2 (D4) are safe **if HIGH during boot**, use pull-up resistors.
+- GPIO15 (D8) is safe **if LOW during boot**, use a pull-down resistor.
+
+In general, [pull resistors](https://en.wikipedia.org/wiki/Pull-up_resistor) shoult be between 10kΩ..100kΩ.
 
 ### digital output
 
-When connecting LEDs, use at least 470 Ohm resistors in series to not damage the chip.
+When connecting LEDs, use at least 470Ω resistors in series to not damage the chip.
 Charlieplexing is possible with low-current LEDs (~12mA).
 
 ### analog input
