@@ -9,13 +9,12 @@ Have one or two receivers connected to it and send inputs of some buttons to the
 
 ### digital input
 
-Safe to use are
-- GPIO16 (D0)
-- GPIO5 (D1)
-- GPIO4 (D2)
-- GPIO14 (D5)
-- GPIO12 (D6)
-- GPIO13 (D7)
+- GPIO16 (D0) safe to use.
+- GPIO5 (D1) safe to use.
+- GPIO4 (D2) safe to use.
+- GPIO14 (D5) safe to use.
+- GPIO12 (D6) safe to use.
+- GPIO13 (D7) safe to use.
 - GPIO0 (D3) and GPIO2 (D4) are safe **if HIGH during boot**, use pull-up resistors.
 - GPIO15 (D8) is safe **if LOW during boot**, use a pull-down resistor.
 - Also available are GPIO1 (U0TXD) and GPIO3 (U0RXD) **if not using serial**.
