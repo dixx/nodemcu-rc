@@ -3,6 +3,7 @@ Remote Control using NodeMCU WiFi
 
 ## goal
 Have one or two receivers connected to it and send inputs of some buttons to them via own WiFi.
+Based on [this StackExchange post](https://iot.stackexchange.com/questions/1814/esp8266-without-web-page/1815#1815) two web servers are used for data transfer.
 
 ---
 # hardware hints
