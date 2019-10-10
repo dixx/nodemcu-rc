@@ -1,15 +1,20 @@
 #include <stdint.h>
 #include "Arduino.h"
 #include "Ticker.h"
+#include "ESP8266WiFi.h"
+// #include "ESP8266WebServer.h"
 #include "core.h"
+#include "my_secrets.h" // <-- here goes the SSID and WiFi passphrase
 
-const uint32_t SWITCH1 = D1;
-const uint32_t SWITCH2 = D2;
-const uint32_t OUT1 = D5;
-const uint32_t OUT2 = D6;
+const uint32_t BUTTON_1 = D1;
+const uint32_t BUTTON_2 = D2;
+const uint32_t LED_1 = D5;
+const uint32_t LED_2 = D6;
 const uint32_t FLASH_DURATION = 200; // ms
+const IPAddress IP(192, 168, 10, 101);
+const IPAddress SUBNET(255, 255, 255, 0);
 Ticker blocker;
-bool writingAllowed = true;
+bool writingAllowed = true; // TODO make class
 
 void allowWriting() {
     writingAllowed = true;
@@ -28,29 +33,47 @@ void printA0() {
     }
 }
 
-void checkInput() {
-    if (digitalRead(SWITCH1)) {
-        digitalWrite(OUT1, HIGH);
-        printA0();
+void processInput() {
+    if (digitalRead(BUTTON_1)) {
+        // do something
     } else {
-        digitalWrite(OUT1, LOW);
+        // do something
     }
-    if (digitalRead(SWITCH2)) {
-        digitalWrite(OUT2, HIGH);
+    if (digitalRead(BUTTON_2)) {
+        // do something
     } else {
-        digitalWrite(OUT2, LOW);
+        // do something
+    }
+}
+
+void checkClients() {
+    if (WiFi.softAPgetStationNum() > 0) {
+        digitalWrite(LED_2, HIGH);
+    } else {
+        digitalWrite(LED_2, LOW);
     }
 }
 
 void setup() {
     serial::init();
     onboard_led::init();
-    pinMode(SWITCH1, INPUT);
-    pinMode(SWITCH2, INPUT);
-    pinMode(OUT1, OUTPUT);
-    pinMode(OUT2, OUTPUT);
+    pinMode(BUTTON_1, INPUT);
+    pinMode(BUTTON_2, INPUT);
+    pinMode(LED_1, OUTPUT);
+    pinMode(LED_2, OUTPUT);
+    WiFi.softAPConfig(IP, IP, SUBNET);
+    if (WiFi.softAP(RC_SSID, RC_WLAN_PASSWORD, 8 /* channel */, true /* hidden SSID */, 2 /* max connections */)) {
+        Serial.println("WiFi on.");
+        Serial.print("Soft-AP IP address = ");
+        Serial.println(WiFi.softAPIP());
+        Serial.print("MAC address = ");
+        Serial.println(WiFi.softAPmacAddress().c_str());
+    } else {
+        Serial.println("WiFi creation failed.");
+    }
 }
 
 void loop() {
-    checkInput();
+    checkClients();
+    processInput();
 }
