@@ -1,5 +1,5 @@
 # nodemcu-rc
-Remote Control using NodeMCU WiFi
+Remote Control using NodeMCU WiFi. Client can be found [here](https://github.com/dixx/nodemcu-rc-client).
 
 ## goal
 Have one or two receivers connected to it and send inputs of some buttons to them via own WiFi.
