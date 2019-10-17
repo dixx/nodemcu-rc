@@ -3,7 +3,10 @@ Remote Control using NodeMCU WiFi. Client can be found [here](https://github.com
 
 ## goal
 Have one or two receivers connected to it and send inputs of some buttons to them via own WiFi.
-Based on [this StackExchange post](https://iot.stackexchange.com/questions/1814/esp8266-without-web-page/1815#1815) two web servers are used for data transfer.
+~Based on [this StackExchange post](https://iot.stackexchange.com/questions/1814/esp8266-without-web-page/1815#1815) two web servers are used for data transfer.~
+
+## Learnings
+- Using web servers seems a good idea at first, because it is easy to prototype. Letting the RC wait for the client to **answer** the request blocks the RC for that time, though.
 
 ---
 # hardware hints
