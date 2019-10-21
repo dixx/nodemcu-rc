@@ -13,7 +13,6 @@ AnalogInput SPEED(A0);
 const uint32_t LED_1 = D5;
 const uint32_t LED_2 = D6;
 const uint32_t FLASH_DURATION = 200; // ms
-const uint32_t MESH_PORT = 5555;
 bool inputAvailable = false;
 bool clientsConnected = false;
 painlessMesh network;
@@ -62,7 +61,7 @@ void setup() {
     pinMode(LED_2, OUTPUT);
     network.setDebugMsgTypes(ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE); // all types on
     //network.setDebugMsgTypes(ERROR | STARTUP);  // set before init() so that you can see startup messages
-    network.init(RC_SSID, RC_WLAN_PASSWORD, MESH_PORT);
+    network.init(RC_SSID, RC_WLAN_PASSWORD);
     network.onReceive(&receivedCallback);
     network.onNewConnection(&newConnectionCallback);
 }
