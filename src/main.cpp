@@ -19,9 +19,10 @@ const IPAddress SUBNET(255, 255, 255, 0);
 const String CLIENT_URL("http://192.168.10.73/");
 Ticker blocker;
 bool keepAlive = true; // TODO make class
-bool inputChanged = false;
+bool inputPresent = false;
 bool clientsConnected = false;
 String data = "";
+WiFiClient client;
 
 void allowSendingKeepAlive() {
     keepAlive = true;
@@ -36,13 +37,12 @@ void denySendingKeepAlive() {
 void sendKeepAlive() {
     if (!keepAlive) return;
 
-    WiFiClient client;
     HTTPClient http;
     http.begin(client, CLIENT_URL + "keep-alive");
     Serial.print("keep alive: ");
-    Serial.print(http.GET());
-    Serial.print(", ");
-    Serial.println(http.getString());
+    Serial.println(http.GET());
+    // Serial.print(", ");
+    // Serial.println(http.getString());
     http.end();
     denySendingKeepAlive();
 }
@@ -51,7 +51,7 @@ void processInput() {
     BUTTON_1.update();
     BUTTON_2.update();
     SPEED.update();
-    inputChanged = BUTTON_1.hasChanged() || BUTTON_2.hasChanged();
+    inputPresent = BUTTON_1.state() || BUTTON_2.state();
 }
 
 void checkClients() {
@@ -60,12 +60,10 @@ void checkClients() {
 }
 
 void sendData() {
-    WiFiClient client;
-    client.setTimeout(200);
     HTTPClient http;
-    http.begin(client, CLIENT_URL);
+    http.begin(client, CLIENT_URL + "rc");
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    data = "rc";
+    data = "";
     data += "?d1=";
     data += BUTTON_1.state() ? '1' : '0';
     data += "&d2=";
@@ -73,12 +71,12 @@ void sendData() {
     data += "&a=";
     data += SPEED.value();
     Serial.print("Send: ");
-    Serial.print(CLIENT_URL);
+    Serial.print(CLIENT_URL + "rc");
     Serial.println(data);
     Serial.print("HTTP status code: ");
     Serial.println(http.POST(data));
-    Serial.print("HTTP returned: ");
-    Serial.println(http.getString());
+    // Serial.print("HTTP returned: ");
+    // Serial.println(http.getString());
     http.end();
 }
 
@@ -92,10 +90,10 @@ void setup() {
     pinMode(LED_2, OUTPUT);
     WiFi.mode(WIFI_AP);
     WiFi.setSleepMode(WIFI_NONE_SLEEP);
+    WiFi.setAutoReconnect(false);
     WiFi.softAPConfig(IP, IP, SUBNET);
-    if (WiFi.softAP(RC_SSID, RC_WLAN_PASSWORD, 8 /* channel */, true /* hidden SSID */, 2 /* max connections */)) {
-        Serial.print("WiFi on: ");
-        Serial.println(WiFi.softAPIP());
+    if (WiFi.softAP(RC_SSID, RC_WLAN_PASSWORD)) {//, 8 /* channel */, true /* hidden SSID */, 2 /* max connections */)) {
+        WiFi.printDiag(Serial);
     } else {
         Serial.println("WiFi creation failed.");
     }
@@ -105,7 +103,6 @@ void loop() {
     checkClients();
     processInput();
     if (clientsConnected) {
-        sendKeepAlive();
-        if (inputChanged) sendData();
+        if (inputPresent) { sendData(); } else { sendKeepAlive(); }
     }
 }
