@@ -3,36 +3,26 @@
 #include "Arduino.h"
 #include "painlessMesh.h"
 #include "core.h"
-#include "analog_input.h"
-#include "digital_input.h"
 #include "my_secrets.h" // <-- here goes RC_SSID and RC_WLAN_PASSWORD
 
-// DigitalInput BUTTON_1(D1);
-// DigitalInput BUTTON_2(D2);
-// AnalogInput SPEED(A0);
-// const uint32_t LED_1 = D5;
-// const uint32_t LED_2 = D6;
-bool inputAvailable = false;
+const uint32_t BUTTON_1 = D1;
+const uint32_t BUTTON_2 = D2;
+const uint32_t SPEED = A0;
+const uint32_t LED_1 = D5;
+const uint32_t LED_2 = D6;
 bool clientsConnected = false;
+bool inputAvailable = false;
 std::list<uint32_t> nodes;
 Scheduler userScheduler;
 painlessMesh network;
 
-void processInput() {
-    // BUTTON_1.update();
-    // BUTTON_2.update();
-    // SPEED.update();
-    // inputAvailable = BUTTON_1.state() || BUTTON_2.state();
-}
-
-// void checkClients() {
-//     std::list<uint32_t> nodes = network.getNodeList();
-//     clientsConnected = (nodes.size() > 0);
-//     digitalWrite(LED_2, clientsConnected ? HIGH : LOW);
-// }
-
 void receivedCallback(uint32_t from, String& msg) {
-    Serial.printf("Received from %u: msg=%s\n", from, msg.c_str());
+    if (msg.equals("·")) {
+        Serial.print("KeepAlive received from ");
+        Serial.println(from);
+    } else {
+        Serial.printf("Received from %u: msg=%s\n", from, msg.c_str());
+    }
 }
 
 void newConnectionCallback(uint32_t nodeId) {
@@ -40,7 +30,10 @@ void newConnectionCallback(uint32_t nodeId) {
 }
 
 void changedConnectionCallback() {
-    Serial.printf("Changed connections, nodes: %d\n", network.getNodeList().size());
+    nodes = network.getNodeList();
+    clientsConnected = (nodes.size() > 0);
+    digitalWrite(LED_2, clientsConnected ? HIGH : LOW);
+    Serial.printf("Changed connections, nodes: %d\n", nodes.size());
 }
 
 void nodeTimeAdjustedCallback(int32_t offset) {
@@ -52,32 +45,35 @@ void delayReceivedCallback(uint32_t from, int32_t delay) {
 }
 
 void sendData() {
-    //     digitalWrite(LED_1, HIGH);
-    //     String message = "";
-    //     message += "d1=";
-    //     message += BUTTON_1.state() ? "1" : "0";
-    //     message += ":d2=";
-    //     message += BUTTON_2.state() ? "1" : "0";
-    //     message += ":a=";
-    //     message += SPEED.value();
-    //     network.sendBroadcast(message);
-    //     digitalWrite(LED_1, LOW);
+    if (!inputAvailable) { return; }
+
+    digitalWrite(LED_1, HIGH);
+    String message = "";
+    message += "d1=";
+    message += digitalRead(BUTTON_1) ? "1" : "0";
+    message += ":d2=";
+    message += digitalRead(BUTTON_2) ? "1" : "0";
+    message += ":a=";
+    message += analogRead(SPEED);
+    network.sendBroadcast(message);
+    digitalWrite(LED_1, LOW);
 }
+
+Task taskSendData(500, TASK_FOREVER, &sendData);
 
 Task taskSendKeepAlive(TASK_SECOND * 3 , TASK_FOREVER, []() {
     onboard_led::on();
-    network.sendBroadcast( "·" );
+    network.sendBroadcast("·");
     onboard_led::off();
 });
 
 void setup() {
     serial::init();
     onboard_led::init();
-    // BUTTON_1.init();
-    // BUTTON_2.init();
-    // SPEED.init();
-    // pinMode(LED_1, OUTPUT);
-    // pinMode(LED_2, OUTPUT);
+    pinMode(BUTTON_1, INPUT);
+    pinMode(BUTTON_2, INPUT);
+    pinMode(LED_1, OUTPUT);
+    pinMode(LED_2, OUTPUT);
     network.setDebugMsgTypes(ERROR | DEBUG);
     network.init(RC_SSID, RC_WLAN_PASSWORD, &userScheduler);
     network.onReceive(&receivedCallback);
@@ -87,15 +83,11 @@ void setup() {
     network.onNodeDelayReceived(&delayReceivedCallback);
     userScheduler.addTask(taskSendKeepAlive);
     taskSendKeepAlive.enable();
-
-    randomSeed(analogRead(A0));
+    userScheduler.addTask(taskSendData);
+    taskSendData.enable();
 }
 
 void loop() {
     network.update();
-//     checkClients();
-    processInput();
-//     if (clientsConnected) {
-//         if (inputAvailable) sendData();
-//     }
+    inputAvailable = (clientsConnected && (digitalRead(BUTTON_1) || digitalRead(BUTTON_2)));
 }
